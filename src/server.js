@@ -83,7 +83,9 @@ app.use(compression());
 app.use(morgan('dev'));
 app.use(cors());
 app.use(helmet({
-  contentSecurityPolicy: false // disabled so inline scripts work in HTML
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true }));
