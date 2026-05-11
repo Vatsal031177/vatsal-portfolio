@@ -1,5 +1,6 @@
 [build]
-builder = "NIXPACKS"
+# Removing NIXPACKS to allow Railway to use standard buildpacks
+# which have better support for prebuilt native binaries.
 
 [deploy]
 startCommand = "npm start"
