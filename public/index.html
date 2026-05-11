@@ -246,9 +246,59 @@ footer p{font-size:0.78rem;color:var(--muted);}
 #scroll-top{position:fixed;bottom:2rem;left:2rem;width:48px;height:48px;background:var(--card);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:99;opacity:0;visibility:hidden;transition:all 0.3s;}
 #scroll-top.show{opacity:1;visibility:visible;}
 #scroll-top:hover{background:var(--red);border-color:var(--red);color:white;transform:translateY(-5px);}
+/* AI AGENT */
+#ai-bubble{position:fixed;bottom:2rem;right:2rem;width:60px;height:60px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1000;box-shadow:0 10px 40px rgba(229,9,20,0.5);transition:all 0.3s;border:2px solid rgba(255,255,255,0.2);}
+#ai-bubble:hover{transform:scale(1.1) rotate(15deg);}
+#ai-bubble svg{width:30px;height:30px;fill:white;}
+#ai-panel{position:fixed;bottom:6rem;right:2rem;width:380px;height:500px;background:var(--card);border:1px solid var(--border);border-radius:16px;z-index:1000;display:none;flex-direction:column;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.8);backdrop-filter:blur(20px);}
+#ai-panel.show{display:flex;animation:panelIn 0.4s cubic-bezier(0.16,1,0.3,1);}
+@keyframes panelIn{from{opacity:0;transform:translateY(20px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+.ai-header{background:var(--bg3);padding:1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ai-header-title{font-family:var(--font-mono);font-size:0.75rem;letter-spacing:0.1em;color:var(--red);font-weight:700;}
+.ai-close{cursor:pointer;color:var(--muted);transition:color 0.2s;}
+.ai-close:hover{color:white;}
+.ai-messages{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;scrollbar-width:none;}
+.ai-msg{max-width:85%;padding:0.8rem 1.2rem;border-radius:12px;font-size:0.85rem;line-height:1.5;position:relative;}
+.ai-msg.bot{background:var(--bg3);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;}
+.ai-msg.user{background:var(--red);color:white;align-self:flex-end;border-bottom-right-radius:2px;}
+.ai-input-area{padding:1.2rem;background:var(--bg3);border-top:1px solid var(--border);display:flex;gap:0.8rem;}
+.ai-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem 1rem;color:white;font-family:var(--font-body);font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+.ai-input:focus{border-color:var(--red);}
+.ai-send{background:var(--red);border:none;border-radius:8px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;}
+.ai-send:hover{background:var(--red2);transform:scale(1.05);}
+.ai-typing{display:flex;gap:4px;padding:0.5rem 0;}
+.ai-dot{width:4px;height:4px;background:var(--muted);border-radius:50%;animation:aiPulse 1.4s infinite;}
+.ai-dot:nth-child(2){animation-delay:0.2s;}
+.ai-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes aiPulse{0%,100%{opacity:0.3;transform:scale(1);}50%{opacity:1;transform:scale(1.2);}}
+
+@media(max-width:480px){
+  #ai-panel{width:calc(100vw - 2rem);right:1rem;left:1rem;bottom:5.5rem;height:60vh;}
+  #ai-bubble{bottom:1rem;right:1rem;}
+}
 </style>
 </head>
 <body>
+
+<!-- AI AGENT -->
+<div id="ai-bubble" onclick="toggleAI()">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM15 11H17V13H15V11ZM7 11H9V13H7V11ZM12 18C14.5 18 16.73 16.45 17.65 14.25L15.82 13.5C15.18 15 13.71 16 12 16C10.29 16 8.82 15 8.18 13.5L6.35 14.25C7.27 16.45 9.5 18 12 18Z"/></svg>
+</div>
+<div id="ai-panel">
+  <div class="ai-header">
+    <div class="ai-header-title">VM-AI PORTFOLIO ASSISTANT</div>
+    <div class="ai-close" onclick="toggleAI()">✕</div>
+  </div>
+  <div class="ai-messages" id="ai-msgs">
+    <div class="ai-msg bot">Hi! I'm Vatsal's AI assistant. Ask me anything about his skills, projects, or experience!</div>
+  </div>
+  <div class="ai-input-area">
+    <input type="text" id="ai-input" class="ai-input" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')askAI()"/>
+    <button class="ai-send" onclick="askAI()">
+      <svg style="width:18px;height:18px;fill:white;" viewBox="0 0 24 24"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg>
+    </button>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -438,15 +488,16 @@ footer p{font-size:0.78rem;color:var(--muted);}
   <div class="section-label">// 04 — Projects</div>
   <h2 class="section-title reveal">Featured Work</h2>
   <div class="projects-scroll">
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Voice-Recognition-and-AI-agent" target="_blank"><div class="project-card-header"><div class="project-num">01</div><div class="project-cat">NLP</div></div><div class="project-card-body"><div class="project-title">Voice Recognition Agent</div><div class="project-desc">Conversational NLP agent enabling voice-driven task automation with natural language understanding and real-time response generation.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Object-detection-application-" target="_blank"><div class="project-card-header"><div class="project-num">02</div><div class="project-cat">Computer Vision</div></div><div class="project-card-body"><div class="project-title">Image Segmentation & Object Detection</div><div class="project-desc">Real-time YOLO-based object detection pipeline with OpenCV and TensorFlow for identifying objects.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">03</div><div class="project-cat">Aerospace</div></div><div class="project-card-body"><div class="project-title">Rocketry Development (ISRO)</div><div class="project-desc">Rocketry simulation and hardware design in collaboration with the Indian Space Research Organisation.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/teams-super" target="_blank"><div class="project-card-header"><div class="project-num">04</div><div class="project-cat">NLP</div></div><div class="project-card-body"><div class="project-title">Super-Teams</div><div class="project-desc">NLP-powered intelligent team formation and recommendation system analysing skillsets and compatibility.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">05</div><div class="project-cat">HPC</div></div><div class="project-card-body"><div class="project-title">Heterogeneous HPC Hardware</div><div class="project-desc">GPU/CPU workload balancing on NVIDIA Jetson hardware for high-performance computing and edge AI inference.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/weather-application" target="_blank"><div class="project-card-header"><div class="project-num">06</div><div class="project-cat">Mobile</div></div><div class="project-card-body"><div class="project-title">Real-Time Weather & Mapping</div><div class="project-desc">Flutter app integrating live REST weather APIs with interactive mapping for real-time environmental data.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">07</div><div class="project-cat">Security</div></div><div class="project-card-body"><div class="project-title">Captcha Code Development</div><div class="project-desc">Custom CAPTCHA generation and validation with bot-detection logic and adaptive difficulty.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Task-Management-application-using-Dart" target="_blank"><div class="project-card-header"><div class="project-num">08</div><div class="project-cat">Productivity</div></div><div class="project-card-body"><div class="project-title">Task Management Viewer</div><div class="project-desc">Full-stack task management dashboard with real-time collaboration features built in Dart.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
-    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">09</div><div class="project-cat">Mobile</div></div><div class="project-card-body"><div class="project-title">Ru-View Project</div><div class="project-desc">Cross-platform mobile application delivering an immersive, real-time view experience with Flutter.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal" style="border-color:var(--red);box-shadow:0 0 20px rgba(229,9,20,0.1);"><a href="#ai-panel" onclick="toggleAI();return false;"><div class="project-card-header"><div class="project-num">01</div><div class="project-cat">FLAGSHIP · AI</div></div><div class="project-card-body"><div class="project-title">VM-AI: Career Intelligence Agent</div><div class="project-desc">A context-aware AI assistant integrated directly into this portfolio. Uses LLMs to provide real-time, semantic insights into Vatsal's technical expertise and career achievements.</div><div class="project-card-link" style="color:var(--white);">Try the Agent ➔</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Voice-Recognition-and-AI-agent" target="_blank"><div class="project-card-header"><div class="project-num">02</div><div class="project-cat">NLP</div></div><div class="project-card-body"><div class="project-title">Voice Recognition Agent</div><div class="project-desc">Conversational NLP agent enabling voice-driven task automation with natural language understanding and real-time response generation using spaCy and NLTK.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Object-detection-application-" target="_blank"><div class="project-card-header"><div class="project-num">03</div><div class="project-cat">Computer Vision</div></div><div class="project-card-body"><div class="project-title">Image Segmentation & Object Detection</div><div class="project-desc">Real-time YOLO-based object detection pipeline with OpenCV and TensorFlow for identifying objects under varying environmental conditions.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">04</div><div class="project-cat">Aerospace</div></div><div class="project-card-body"><div class="project-title">Rocketry Development (ISRO)</div><div class="project-desc">Rocketry simulation and embedded hardware design in collaboration with the Indian Space Research Organisation.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/teams-super" target="_blank"><div class="project-card-header"><div class="project-num">05</div><div class="project-cat">NLP</div></div><div class="project-card-body"><div class="project-title">Super-Teams</div><div class="project-desc">NLP-powered intelligent team formation and recommendation system analysing skillsets and compatibility for optimal team configurations.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">06</div><div class="project-cat">HPC</div></div><div class="project-card-body"><div class="project-title">Heterogeneous HPC Hardware</div><div class="project-desc">GPU/CPU workload balancing on NVIDIA Jetson hardware for high-performance computing and edge AI inference.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/weather-application" target="_blank"><div class="project-card-header"><div class="project-num">07</div><div class="project-cat">Mobile</div></div><div class="project-card-body"><div class="project-title">Real-Time Weather & Mapping</div><div class="project-desc">Flutter app integrating live REST weather APIs with interactive mapping for real-time environmental data visualization.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">08</div><div class="project-cat">Security</div></div><div class="project-card-body"><div class="project-title">Captcha Code Development</div><div class="project-desc">Custom CAPTCHA generation and validation system with intelligent bot-detection logic and adaptive difficulty scaling.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Task-Management-application-using-Dart" target="_blank"><div class="project-card-header"><div class="project-num">09</div><div class="project-cat">Productivity</div></div><div class="project-card-body"><div class="project-title">Task Management Viewer</div><div class="project-desc">Full-stack task management dashboard with real-time collaboration features, progress tracking, and priority-based workflow built in Dart.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
+    <div class="project-card reveal"><a href="https://github.com/Vatsal031177/Vatsal031177" target="_blank"><div class="project-card-header"><div class="project-num">10</div><div class="project-cat">Mobile</div></div><div class="project-card-body"><div class="project-title">Ru-View Project</div><div class="project-desc">Cross-platform mobile application delivering an immersive, real-time view experience with Flutter and Firebase backend integration.</div><div class="project-card-link">View GitHub ↗</div></div></a></div>
   </div>
 </section>
 
@@ -761,6 +812,54 @@ if (menuBtn && drawer) {
     if (menuOpen) { bars[0].style.transform='rotate(45deg) translate(4px,4px)'; bars[1].style.opacity='0'; bars[2].style.transform='rotate(-45deg) translate(4px,-4px)'; }
     else bars.forEach(b => { b.style.transform=''; b.style.opacity=''; });
   });
+}
+
+// ── AI AGENT LOGIC ──────────────────────────────────────────────────────────
+const aiPanel = document.getElementById('ai-panel');
+const aiInput = document.getElementById('ai-input');
+const aiMsgs = document.getElementById('ai-msgs');
+
+function toggleAI() {
+  aiPanel.classList.toggle('show');
+  if (aiPanel.classList.contains('show')) aiInput.focus();
+}
+
+async function askAI() {
+  const text = aiInput.value.trim();
+  if (!text) return;
+
+  // Add user message
+  appendAiMsg(text, 'user');
+  aiInput.value = '';
+
+  // Add typing indicator
+  const typingId = 'typing-' + Date.now();
+  const typingHtml = `<div class="ai-msg bot" id="${typingId}"><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>`;
+  aiMsgs.insertAdjacentHTML('beforeend', typingHtml);
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
+
+  try {
+    const r = await fetch('/api/ai/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: text })
+    });
+    const d = await r.json();
+    
+    document.getElementById(typingId).remove();
+    appendAiMsg(d.answer || "I'm not sure about that, but Vatsal would love to chat! Reach him at vatsalde0311@gmail.com", 'bot');
+  } catch (e) {
+    document.getElementById(typingId).remove();
+    appendAiMsg("Connection lost. Please try again or email Vatsal!", 'bot');
+  }
+}
+
+function appendAiMsg(text, type) {
+  const msg = document.createElement('div');
+  msg.className = `ai-msg ${type}`;
+  msg.textContent = text;
+  aiMsgs.appendChild(msg);
+  aiMsgs.scrollTop = aiMsgs.scrollHeight;
 }
 
 // ── SCROLL REVEAL ─────────────────────────────────────────────────────────────

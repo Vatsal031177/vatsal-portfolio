@@ -10,6 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -363,6 +364,49 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
     res.json({ totalVisits, uniqueVisitors, unreadMessages, totalDownloads, cvDownloads, clDownloads, recentVisits, topPages, topReferrers, recentMessages, reactionStats });
   } catch (e) {
     res.status(500).json({ error: 'Failed' });
+  }
+});
+
+// ── API: AI PORTFOLIO AGENT ──────────────────────────────────────────────────
+const VATSAL_CONTEXT = `
+Vatsal Maisuria is a results-driven Software Developer & Computer Engineer based in Ingolstadt, Germany.
+Key Stats: 3+ years experience, 8.32 CGPA (Distinction), 65% defect reduction, 40% faster deployments.
+Expertise: Flutter (SDK, BLoC, Clean Architecture), Java (Spring Boot, Microservices), Python, AI/ML (TensorFlow, OpenCV, NLP), DevOps (Docker, GitHub Actions, CI/CD).
+Work History: Annextech Software (QA Developer & Software Developer).
+Projects: Voice Recognition AI Agent, Object Detection pipeline, ISRO Rocketry simulation, Super-Teams NLP formation, Weather/Mapping apps.
+Education: B.E. in Computer Science (Gujarat Technological University).
+Languages: English (Fluent), German (Intermediate), Hindi/Gujarati (Native).
+Personality: Technical, precise, innovative, and results-oriented.
+`;
+
+app.post('/api/ai/ask', async (req, res) => {
+  const { question } = req.body;
+  if (!question) return res.status(400).json({ error: 'No question provided' });
+
+  const apiKey = process.env.AI_API_KEY;
+  if (!apiKey) {
+    // High-quality local fallback responses if no API key is present
+    const q = question.toLowerCase();
+    if (q.includes('flutter')) return res.json({ answer: "Vatsal is a Flutter expert. He uses Clean Architecture, BLoC, and has built apps serving thousands of users with 60 FPS performance." });
+    if (q.includes('experience')) return res.json({ answer: "Vatsal has 3+ years of professional experience, primarily at Annextech Software as a Software Developer and QA Engineer." });
+    if (q.includes('contact') || q.includes('email')) return res.json({ answer: "You can reach Vatsal at vatsalde0311@gmail.com or via the contact form on this site." });
+    return res.json({ answer: "I'm Vatsal's AI assistant. I'm currently in 'offline mode' because an API key hasn't been set, but I can tell you that Vatsal is a highly skilled developer specializing in Flutter, Java, and AI!" });
+  }
+
+  try {
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: `You are VM-AI, the official AI assistant for Vatsal Maisuria's portfolio. Use the following context to answer questions about him professionally and concisely. If you don't know something, say you'll refer them to his email. Context: ${VATSAL_CONTEXT}` },
+        { role: "user", content: question }
+      ]
+    }, {
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' }
+    });
+
+    res.json({ answer: response.data.choices[0].message.content });
+  } catch (error) {
+    res.json({ answer: "I'm having a bit of trouble connecting to my brain right now! Please try again in a moment or contact Vatsal directly." });
   }
 });
 
