@@ -65,6 +65,7 @@ db.exec(`
 
   CREATE TABLE IF NOT EXISTS cv_downloads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT DEFAULT 'cv',
     ip TEXT,
     user_agent TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -142,6 +143,8 @@ app.get('/api/stats', (req, res) => {
     ).get().n;
     const totalMessages = db.prepare('SELECT COUNT(*) as n FROM messages').get().n;
     const totalDownloads = db.prepare('SELECT COUNT(*) as n FROM cv_downloads').get().n;
+    const cvDownloads = db.prepare("SELECT COUNT(*) as n FROM cv_downloads WHERE type = 'cv'").get().n;
+    const clDownloads = db.prepare("SELECT COUNT(*) as n FROM cv_downloads WHERE type = 'cl'").get().n;
     const totalReactions = db.prepare('SELECT COUNT(*) as n FROM reactions').get().n;
 
     // Visits per day last 7 days
@@ -169,6 +172,8 @@ app.get('/api/stats', (req, res) => {
       todayVisits,
       totalMessages,
       totalDownloads,
+      cvDownloads,
+      clDownloads,
       totalReactions,
       weeklyVisits,
       topReferrers
@@ -228,12 +233,13 @@ app.post('/api/contact', contactLimit, (req, res) => {
   }
 });
 
-// ── API: CV DOWNLOAD TRACKING ─────────────────────────────────────────────────
-app.post('/api/cv-download', (req, res) => {
+// ── API: CV/CL DOWNLOAD TRACKING ─────────────────────────────────────────────
+app.post('/api/download/:type', (req, res) => {
   try {
+    const { type } = req.params;
     const ip = getIP(req);
     const ua = req.headers['user-agent'] || '';
-    db.prepare('INSERT INTO cv_downloads (ip, user_agent) VALUES (?, ?)').run(ip, ua);
+    db.prepare('INSERT INTO cv_downloads (type, ip, user_agent) VALUES (?, ?, ?)').run(type, ip, ua);
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });
@@ -326,6 +332,8 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
     const uniqueVisitors = db.prepare('SELECT COUNT(DISTINCT session_id) as n FROM visits').get().n;
     const unreadMessages = db.prepare('SELECT COUNT(*) as n FROM messages WHERE read = 0').get().n;
     const totalDownloads = db.prepare('SELECT COUNT(*) as n FROM cv_downloads').get().n;
+    const cvDownloads = db.prepare("SELECT COUNT(*) as n FROM cv_downloads WHERE type = 'cv'").get().n;
+    const clDownloads = db.prepare("SELECT COUNT(*) as n FROM cv_downloads WHERE type = 'cl'").get().n;
 
     const recentVisits = db.prepare(`
       SELECT date(created_at) as day, COUNT(*) as visits
@@ -352,7 +360,7 @@ app.get('/api/admin/stats', adminAuth, (req, res) => {
       SELECT type, COUNT(*) as count FROM reactions GROUP BY type
     `).all();
 
-    res.json({ totalVisits, uniqueVisitors, unreadMessages, totalDownloads, recentVisits, topPages, topReferrers, recentMessages, reactionStats });
+    res.json({ totalVisits, uniqueVisitors, unreadMessages, totalDownloads, cvDownloads, clDownloads, recentVisits, topPages, topReferrers, recentMessages, reactionStats });
   } catch (e) {
     res.status(500).json({ error: 'Failed' });
   }

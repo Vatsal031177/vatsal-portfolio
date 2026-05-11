@@ -108,8 +108,9 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2re
       <div class="stats-row">
         <div class="stat-card"><div class="stat-num" id="a-total">—</div><div class="stat-label">Total Visits</div></div>
         <div class="stat-card"><div class="stat-num" id="a-unique">—</div><div class="stat-label">Unique Visitors</div></div>
-        <div class="stat-card green"><div class="stat-num" id="a-downloads">—</div><div class="stat-label">CV Downloads</div></div>
-        <div class="stat-card yellow"><div class="stat-num" id="a-unread">—</div><div class="stat-label">Unread Messages</div></div>
+        <div class="stat-card green"><div class="stat-num" id="a-cv-dl">—</div><div class="stat-label">CV DLs</div></div>
+        <div class="stat-card green"><div class="stat-num" id="a-cl-dl">—</div><div class="stat-label">CL DLs</div></div>
+        <div class="stat-card yellow"><div class="stat-num" id="a-unread">—</div><div class="stat-label">Unread</div></div>
       </div>
 
       <div class="chart-wrap">
@@ -188,7 +189,8 @@ async function loadAdminData() {
     const d = await r.json();
     document.getElementById('a-total').textContent = d.totalVisits.toLocaleString();
     document.getElementById('a-unique').textContent = d.uniqueVisitors.toLocaleString();
-    document.getElementById('a-downloads').textContent = d.totalDownloads.toLocaleString();
+    document.getElementById('a-cv-dl').textContent = d.cvDownloads.toLocaleString();
+    document.getElementById('a-cl-dl').textContent = d.clDownloads.toLocaleString();
     document.getElementById('a-unread').textContent = d.unreadMessages;
     if (d.unreadMessages > 0) {
       document.getElementById('unread-badge').textContent = d.unreadMessages;

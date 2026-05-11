@@ -301,7 +301,8 @@ footer p{font-size:0.78rem;color:var(--muted);}
     <div class="hero-cta">
       <a href="#experience" class="btn btn-primary">▶&nbsp; View Experience</a>
       <a href="#contact" class="btn btn-ghost">✉&nbsp; Get in Touch</a>
-      <a href="/vatsal-maisuria-cv.pdf" id="cv-download-btn" class="btn btn-ghost" download>⬇&nbsp; Download CV</a>
+      <a href="/vatsal-maisuria-cv.pdf" class="btn btn-ghost dl-btn" data-type="cv" download>⬇&nbsp; CV</a>
+      <a href="/vatsal-maisuria-cover-letter.pdf" class="btn btn-ghost dl-btn" data-type="cl" download>⬇&nbsp; Cover Letter</a>
       <a href="tel:+491621630552" class="btn btn-ghost">📞&nbsp; Call Me</a>
     </div>
   </div>
@@ -337,7 +338,7 @@ footer p{font-size:0.78rem;color:var(--muted);}
   </div>
   <div class="visitor-stat">
     <div class="visitor-stat-num" id="stat-downloads"><span>—</span></div>
-    <div class="visitor-stat-label">CV Downloads</div>
+    <div class="visitor-stat-label">Downloads</div>
   </div>
   <div style="margin-left:auto;font-family:var(--font-mono);font-size:0.65rem;color:var(--muted);">LIVE ANALYTICS</div>
 </div>
@@ -675,9 +676,11 @@ async function sendMessage() {
   btn.textContent = '✉ Send Message'; btn.disabled = false;
 }
 
-// ── CV DOWNLOAD TRACKING ──────────────────────────────────────────────────────
-document.getElementById('cv-download-btn')?.addEventListener('click', () => {
-  fetch('/api/cv-download', { method: 'POST' }).catch(() => {});
+// ── CV/CL DOWNLOAD TRACKING ──────────────────────────────────────────────────
+document.querySelectorAll('.dl-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    fetch(`/api/download/${btn.dataset.type}`, { method: 'POST' }).catch(() => {});
+  });
 });
 
 // ── TOAST ─────────────────────────────────────────────────────────────────────
