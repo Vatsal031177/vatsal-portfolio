@@ -286,11 +286,20 @@ footer p{font-size:0.78rem;color:var(--muted);}
 </div>
 <div id="ai-panel">
   <div class="ai-header">
-    <div class="ai-header-title">VM-AI PORTFOLIO ASSISTANT</div>
-    <div class="ai-close" onclick="toggleAI()">✕</div>
+    <div class="ai-header-title">VM-AI COMMAND CENTER</div>
+    <div style="display:flex;gap:1rem;align-items:center;">
+      <div id="ai-voice-toggle" onclick="toggleVoice()" title="Toggle Voice Response" style="cursor:pointer;opacity:0.5;transition:0.3s;">
+        <svg style="width:18px;height:18px;fill:var(--red);" viewBox="0 0 24 24"><path d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"/></svg>
+      </div>
+      <div class="ai-close" onclick="toggleAI()">✕</div>
+    </div>
+  </div>
+  <div id="ai-status" style="background:var(--bg);padding:0.5rem 1.2rem;font-size:0.65rem;font-family:var(--font-mono);color:var(--muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;">
+    <span>STATUS: NEURAL_LINK_ACTIVE</span>
+    <span id="ai-mode">MODE: TECHNICAL</span>
   </div>
   <div class="ai-messages" id="ai-msgs">
-    <div class="ai-msg bot">Hi! I'm Vatsal's AI assistant. Ask me anything about his skills, projects, or experience!</div>
+    <div class="ai-msg bot">System Initialized. I am VM-AI, Vatsal's multimodal career intelligence suite. How can I assist your evaluation today?</div>
   </div>
   <div class="ai-input-area">
     <input type="text" id="ai-input" class="ai-input" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')askAI()"/>
@@ -818,21 +827,38 @@ if (menuBtn && drawer) {
 const aiPanel = document.getElementById('ai-panel');
 const aiInput = document.getElementById('ai-input');
 const aiMsgs = document.getElementById('ai-msgs');
+const aiVoiceBtn = document.getElementById('ai-voice-toggle');
+let voiceEnabled = false;
+let synth = window.speechSynthesis;
 
 function toggleAI() {
   aiPanel.classList.toggle('show');
   if (aiPanel.classList.contains('show')) aiInput.focus();
 }
 
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  aiVoiceBtn.style.opacity = voiceEnabled ? '1' : '0.5';
+  if (!voiceEnabled) synth.cancel();
+}
+
+function speak(text) {
+  if (!voiceEnabled) return;
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.pitch = 0.9;
+  utterance.rate = 1.1;
+  synth.speak(utterance);
+}
+
 async function askAI() {
   const text = aiInput.value.trim();
   if (!text) return;
 
-  // Add user message
   appendAiMsg(text, 'user');
   aiInput.value = '';
+  synth.cancel();
 
-  // Add typing indicator
   const typingId = 'typing-' + Date.now();
   const typingHtml = `<div class="ai-msg bot" id="${typingId}"><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>`;
   aiMsgs.insertAdjacentHTML('beforeend', typingHtml);
@@ -847,7 +873,12 @@ async function askAI() {
     const d = await r.json();
     
     document.getElementById(typingId).remove();
-    appendAiMsg(d.answer || "I'm not sure about that, but Vatsal would love to chat! Reach him at vatsalde0311@gmail.com", 'bot');
+    const answer = d.answer || "I'm not sure about that, but Vatsal would love to chat! Reach him at vatsalde0311@gmail.com";
+    
+    if (d.mode) document.getElementById('ai-mode').textContent = `MODE: ${d.mode}`;
+    
+    appendAiMsg(answer, 'bot');
+    speak(answer);
   } catch (e) {
     document.getElementById(typingId).remove();
     appendAiMsg("Connection lost. Please try again or email Vatsal!", 'bot');

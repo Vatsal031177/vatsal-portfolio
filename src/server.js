@@ -383,6 +383,11 @@ app.post('/api/ai/ask', async (req, res) => {
   const { question } = req.body;
   if (!question) return res.status(400).json({ error: 'No question provided' });
 
+  // Mode Detection
+  let mode = 'TECHNICAL';
+  if (question.toLowerCase().includes('hiring') || question.toLowerCase().includes('job')) mode = 'RECRUITER';
+  if (question.toLowerCase().includes('vision') || question.toLowerCase().includes('future')) mode = 'VISIONARY';
+
   const apiKey = process.env.AI_API_KEY;
   if (!apiKey) {
     // High-quality local fallback responses if no API key is present
@@ -397,14 +402,19 @@ app.post('/api/ai/ask', async (req, res) => {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: `You are VM-AI, the official AI assistant for Vatsal Maisuria's portfolio. Use the following context to answer questions about him professionally and concisely. If you don't know something, say you'll refer them to his email. Context: ${VATSAL_CONTEXT}` },
+        { role: "system", content: `You are VM-AI, a high-end Command Center Agent for Vatsal Maisuria. 
+        Current Operating Mode: ${mode}. 
+        - If TECHNICAL: Focus on stack depth, architecture, and code quality.
+        - If RECRUITER: Focus on impact, ROI, team collaboration, and availability.
+        - If VISIONARY: Focus on the future of AI, innovation, and industry trends.
+        Context: ${VATSAL_CONTEXT}` },
         { role: "user", content: question }
       ]
     }, {
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' }
     });
 
-    res.json({ answer: response.data.choices[0].message.content });
+    res.json({ answer: response.data.choices[0].message.content, mode });
   } catch (error) {
     res.json({ answer: "I'm having a bit of trouble connecting to my brain right now! Please try again in a moment or contact Vatsal directly." });
   }
