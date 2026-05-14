@@ -1,320 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin — Vatsal Portfolio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
-:root{--red:#E50914;--bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--card:#141414;--border:rgba(255,255,255,0.08);--text:#e5e5e5;--muted:#666;--white:#fff;--green:#22c55e;--yellow:#f59e0b;--font:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;min-height:100vh;}
-/* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);}
-.login-box{background:var(--card);border:1px solid var(--border);padding:3rem;width:340px;text-align:center;}
-.login-logo{font-size:2.5rem;font-weight:700;color:var(--red);letter-spacing:0.05em;margin-bottom:0.5rem;}
-.login-sub{color:var(--muted);font-size:0.8rem;margin-bottom:2rem;}
-.login-box input{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:0.75rem 1rem;font-family:var(--font);font-size:0.9rem;margin-bottom:1rem;outline:none;transition:border-color 0.2s;}
-.login-box input:focus{border-color:var(--red);}
-.login-box button{width:100%;background:var(--red);color:white;border:none;padding:0.75rem;cursor:pointer;font-family:var(--font);font-weight:600;font-size:0.9rem;transition:background 0.2s;}
-.login-box button:hover{background:#ff1a24;}
-.login-err{color:#f87171;font-size:0.8rem;margin-top:0.75rem;display:none;}
-/* MAIN */
-#app{display:none;}
-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
-.header-logo{font-weight:700;color:var(--red);letter-spacing:0.05em;}
-.header-right{display:flex;align-items:center;gap:1rem;}
-.header-right a{color:var(--muted);text-decoration:none;font-size:0.8rem;transition:color 0.2s;}
-.header-right a:hover{color:var(--white);}
-.logout-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.8rem;cursor:pointer;font-family:var(--font);font-size:0.75rem;transition:all 0.2s;}
-.logout-btn:hover{border-color:var(--red);color:var(--red);}
-.container{padding:2rem;}
-/* STATS GRID */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
-.stat-card{background:var(--card);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden;}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red);}
-.stat-num{font-size:2.2rem;font-weight:700;color:var(--white);line-height:1;margin-bottom:0.3rem;}
-.stat-label{font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);}
-.stat-card.green::before{background:var(--green);}
-.stat-card.yellow::before{background:var(--yellow);}
-/* CHART */
-.chart-wrap{background:var(--card);border:1px solid var(--border);padding:1.5rem;margin-bottom:2rem;}
-.chart-title{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem;font-family:var(--mono);}
-.bar-chart{display:flex;align-items:flex-end;gap:4px;height:100px;}
-.bar{flex:1;background:var(--red);opacity:0.7;border-radius:2px 2px 0 0;transition:opacity 0.2s;position:relative;min-width:16px;}
-.bar:hover{opacity:1;}
-.bar-label{font-size:0.6rem;color:var(--muted);text-align:center;margin-top:4px;font-family:var(--mono);}
-/* MESSAGES */
-.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-.section-head h2{font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-family:var(--mono);}
-.badge{background:var(--red);color:white;font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:2px;font-weight:700;}
-.message-list{display:flex;flex-direction:column;gap:0.75rem;}
-.message-card{background:var(--card);border:1px solid var(--border);padding:1.25rem;transition:border-color 0.2s;position:relative;}
-.message-card.unread{border-left:3px solid var(--red);}
-.message-card.read{border-left:3px solid transparent;opacity:0.65;}
-.msg-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem;gap:1rem;}
-.msg-from{font-weight:600;color:var(--white);font-size:0.9rem;}
-.msg-email{font-size:0.78rem;color:var(--muted);font-family:var(--mono);}
-.msg-date{font-size:0.7rem;color:var(--muted);font-family:var(--mono);white-space:nowrap;}
-.msg-subject{font-size:0.8rem;color:var(--red);margin-bottom:0.5rem;letter-spacing:0.05em;}
-.msg-body{font-size:0.85rem;color:var(--muted);line-height:1.6;white-space:pre-wrap;}
-.msg-actions{display:flex;gap:0.5rem;margin-top:0.75rem;}
-.msg-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:0.3rem 0.75rem;cursor:pointer;font-family:var(--font);font-size:0.75rem;transition:all 0.2s;}
-.msg-btn:hover{border-color:var(--red);color:var(--red);}
-.msg-btn.del:hover{border-color:#f87171;color:#f87171;}
-.empty{text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;}
-/* TABS */
-.tabs{display:flex;gap:0;margin-bottom:2rem;border-bottom:1px solid var(--border);}
-.tab{padding:0.75rem 1.5rem;cursor:pointer;font-size:0.8rem;font-weight:500;letter-spacing:0.08em;color:var(--muted);border-bottom:2px solid transparent;transition:all 0.2s;text-transform:uppercase;}
-.tab.active{color:var(--white);border-bottom-color:var(--red);}
-.tab-content{display:none;}
-.tab-content.active{display:block;}
-/* REFRESH BTN */
-.refresh-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:0.35rem 0.9rem;cursor:pointer;font-family:var(--font);font-size:0.75rem;transition:all 0.2s;}
-.refresh-btn:hover{border-color:var(--text);color:var(--text);}
-</style>
+  <meta charset="UTF-8"/>
+  <title>Admin — Vatsal Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --red: #E50914; --bg: #0a0a0a; --bg-card: #141414; --text: #e5e5e5; --border: rgba(255,255,255,0.1); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+    #login-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-box { background: var(--bg-card); padding: 3rem; border: 1px solid var(--border); width: 350px; text-align: center; }
+    input { width: 100%; background: #000; border: 1px solid var(--border); padding: 0.8rem; color: white; margin-bottom: 1rem; outline: none; }
+    button { width: 100%; background: var(--red); color: white; border: none; padding: 0.8rem; cursor: pointer; font-weight: 700; }
+    #admin-panel { display: none; padding: 50px; max-width: 1200px; margin: 0 auto; }
+    .stat-card { background: var(--bg-card); padding: 2rem; border: 1px solid var(--border); margin-bottom: 2rem; }
+    .msg-card { background: var(--bg-card); padding: 1.5rem; border: 1px solid var(--border); margin-bottom: 1rem; }
+    .msg-header { display: flex; justify-content: space-between; margin-bottom: 1rem; color: var(--red); font-family: 'JetBrains Mono'; font-size: 0.8rem; }
+  </style>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-box">
-    <div class="login-logo">VM</div>
-    <div class="login-sub">Portfolio Admin Dashboard</div>
-    <input type="password" id="pw-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()"/>
-    <button onclick="login()">Access Dashboard</button>
-    <div class="login-err" id="login-err">Incorrect password.</div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-  <header>
-    <span class="header-logo">VM · Admin</span>
-    <div class="header-right">
-      <a href="/" target="_blank">← View Site</a>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-  </header>
-
-  <div class="container">
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('overview')">Overview</div>
-      <div class="tab" onclick="switchTab('messages')">Messages <span id="unread-badge" class="badge" style="display:none"></span></div>
-    </div>
-
-    <!-- OVERVIEW TAB -->
-    <div id="tab-overview" class="tab-content active">
-      <div class="stats-row">
-        <div class="stat-card"><div class="stat-num" id="a-total">—</div><div class="stat-label">Total Visits</div></div>
-        <div class="stat-card"><div class="stat-num" id="a-unique">—</div><div class="stat-label">Unique Visitors</div></div>
-        <div class="stat-card green"><div class="stat-num" id="a-cv-dl">—</div><div class="stat-label">CV DLs</div></div>
-        <div class="stat-card green"><div class="stat-num" id="a-cl-dl">—</div><div class="stat-label">CL DLs</div></div>
-        <div class="stat-card yellow"><div class="stat-num" id="a-unread">—</div><div class="stat-label">Unread</div></div>
-      </div>
-
-      <div class="chart-wrap">
-        <div class="chart-title">// Visits — Last 30 Days</div>
-        <div class="bar-chart" id="bar-chart"></div>
-        <div class="bar-chart" id="bar-labels" style="height:auto;margin-top:0;"></div>
-      </div>
-
-      <div class="chart-wrap">
-        <div class="chart-title">// Top Pages</div>
-        <div id="pages-list"></div>
-      </div>
-
-      <div class="chart-wrap">
-        <div class="chart-title">// Top Referrers</div>
-        <div id="referrers-list"></div>
-      </div>
-
-      <div class="chart-wrap">
-        <div class="chart-title">// Reactions</div>
-        <div id="reactions-list" style="display:flex;gap:1rem;flex-wrap:wrap;"></div>
-      </div>
-    </div>
-
-    <!-- MESSAGES TAB -->
-    <div id="tab-messages" class="tab-content">
-      <div class="section-head">
-        <h2>// Inbox <span id="msg-count" class="badge"></span></h2>
-        <button class="refresh-btn" onclick="loadMessages()">↻ Refresh</button>
-      </div>
-      <div class="message-list" id="message-list">
-        <div class="empty">Loading messages...</div>
-      </div>
+  <div id="login-screen">
+    <div class="login-box">
+      <h2 style="margin-bottom:2rem;color:var(--red)">ADMIN ACCESS</h2>
+      <input type="password" id="pw" placeholder="Enter Password">
+      <button onclick="login()">Login</button>
     </div>
   </div>
-</div>
 
-<script>
-let adminKey = '';
+  <div id="admin-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
+      <h1>Portfolio Command Center</h1>
+      <button onclick="logout()" style="width:auto; padding:0.5rem 1.5rem;">Logout</button>
+    </div>
+    
+    <div class="stat-card">
+      <p style="color:var(--text-dim)">Total Global Visits</p>
+      <h2 id="total-visits" style="font-size:3rem">0</h2>
+    </div>
 
-function login() {
-  const pw = document.getElementById('pw-input').value;
-  if (!pw) return;
-  adminKey = pw;
-  loadAdminData().then(ok => {
-    if (ok) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      sessionStorage.setItem('adminKey', pw);
-    } else {
-      document.getElementById('login-err').style.display = 'block';
-      adminKey = '';
+    <h3 style="margin-bottom:1.5rem">Inbound Messages</h3>
+    <div id="messages-list"></div>
+  </div>
+
+  <script>
+    function login() {
+      const pw = document.getElementById('pw').value;
+      localStorage.setItem('admin_key', pw);
+      loadDashboard();
     }
-  });
-}
+    function logout() { localStorage.removeItem('admin_key'); location.reload(); }
 
-function logout() {
-  sessionStorage.removeItem('adminKey');
-  location.reload();
-}
-
-// Auto-login if key saved
-const saved = sessionStorage.getItem('adminKey');
-if (saved) { adminKey = saved; document.getElementById('pw-input').value = saved; login(); }
-
-function switchTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['overview','messages'][i] === name));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-'+name));
-  if (name === 'messages') loadMessages();
-}
-
-async function loadAdminData() {
-  try {
-    const r = await fetch('/api/admin/stats', { headers: {'x-admin-key': adminKey} });
-    if (r.status === 401) return false;
-    const d = await r.json();
-    document.getElementById('a-total').textContent = d.totalVisits.toLocaleString();
-    document.getElementById('a-unique').textContent = d.uniqueVisitors.toLocaleString();
-    document.getElementById('a-cv-dl').textContent = d.cvDownloads.toLocaleString();
-    document.getElementById('a-cl-dl').textContent = d.clDownloads.toLocaleString();
-    document.getElementById('a-unread').textContent = d.unreadMessages;
-    if (d.unreadMessages > 0) {
-      document.getElementById('unread-badge').textContent = d.unreadMessages;
-      document.getElementById('unread-badge').style.display = 'inline';
-    }
-
-    // Bar chart
-    if (d.recentVisits && d.recentVisits.length) {
-      const max = Math.max(...d.recentVisits.map(v => v.visits));
-      const chart = document.getElementById('bar-chart');
-      const labels = document.getElementById('bar-labels');
-      chart.innerHTML = '';
-      labels.innerHTML = '<div style="display:flex;gap:4px;">';
-      d.recentVisits.forEach(v => {
-        const pct = max > 0 ? Math.max((v.visits / max) * 100, 4) : 4;
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = pct + '%';
-        bar.title = `${v.day}: ${v.visits} visits`;
-        chart.appendChild(bar);
-        const lbl = document.createElement('div');
-        lbl.className = 'bar-label';
-        lbl.style.flex = '1';
-        lbl.textContent = v.day.slice(5); // MM-DD
-        labels.querySelector('div').appendChild(lbl);
-      });
-    }
-
-    // Top Pages
-    const pageList = document.getElementById('pages-list');
-    if (d.topPages && d.topPages.length) {
-      pageList.innerHTML = d.topPages.map(p =>
-        `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
-          <span style="color:var(--text);font-family:var(--mono);">${p.page}</span>
-          <span style="color:var(--red);font-family:var(--mono);">${p.count}</span>
-        </div>`
-      ).join('');
-    } else {
-      pageList.innerHTML = '<div class="empty">No data yet</div>';
-    }
-
-    // Top Referrers
-    const refList = document.getElementById('referrers-list');
-    if (d.topReferrers && d.topReferrers.length) {
-      refList.innerHTML = d.topReferrers.map(r =>
-        `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
-          <span style="color:var(--text);font-family:var(--mono);">${r.referrer}</span>
-          <span style="color:var(--red);font-family:var(--mono);">${r.count}</span>
-        </div>`
-      ).join('');
-    } else {
-      refList.innerHTML = '<div class="empty">No external referrers yet</div>';
-    }
-
-    // Reactions
-    const reactList = document.getElementById('reactions-list');
-    if (d.reactionStats && d.reactionStats.length) {
-      reactList.innerHTML = d.reactionStats.map(s =>
-        `<div style="background:var(--bg3);padding:1rem 1.5rem;border:1px solid var(--border);border-radius:4px;text-align:center;min-width:80px;">
-          <div style="font-size:1.5rem;margin-bottom:0.3rem;">${s.type}</div>
-          <div style="font-family:var(--mono);font-weight:700;color:var(--white);">${s.count}</div>
-        </div>`
-      ).join('');
-    } else {
-      reactList.innerHTML = '<div class="empty">No reactions yet</div>';
-    }
-    return true;
-  } catch(e) { return false; }
-}
-
-async function loadMessages() {
-  try {
-    const r = await fetch('/api/admin/messages', { headers: {'x-admin-key': adminKey} });
-    const msgs = await r.json();
-    const list = document.getElementById('message-list');
-    document.getElementById('msg-count').textContent = msgs.length;
-
-    if (!msgs.length) {
-      list.innerHTML = '<div class="empty">📭 No messages yet</div>';
-      return;
-    }
-
-    list.innerHTML = msgs.map(m => `
-      <div class="message-card ${m.read ? 'read' : 'unread'}" id="msg-${m.id}">
-        <div class="msg-header">
-          <div>
-            <div class="msg-from">${esc(m.name)}</div>
-            <div class="msg-email">${esc(m.email)}</div>
+    async function loadDashboard() {
+      const key = localStorage.getItem('admin_key');
+      try {
+        const res = await fetch('/api/admin/stats', { headers: { 'x-admin-key': key } });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('total-visits').textContent = data.totalVisits;
+        
+        const list = document.getElementById('messages-list');
+        list.innerHTML = data.messages.map(m => `
+          <div class="msg-card">
+            <div class="msg-header">
+              <span>FROM: ${m.name} (${m.email})</span>
+              <span>${new Date(m.created_at).toLocaleString()}</span>
+            </div>
+            <p><strong>${m.subject}</strong></p>
+            <p style="margin-top:0.5rem; color:#aaa">${m.message}</p>
           </div>
-          <div class="msg-date">${new Date(m.created_at).toLocaleString()}</div>
-        </div>
-        <div class="msg-subject">Re: ${esc(m.subject)}</div>
-        <div class="msg-body">${esc(m.message)}</div>
-        <div class="msg-actions">
-          <a href="mailto:${esc(m.email)}?subject=Re: ${esc(m.subject)}" class="msg-btn">↩ Reply</a>
-          ${!m.read ? `<button class="msg-btn" onclick="markRead('${m.id}')">✓ Mark Read</button>` : ''}
-          <button class="msg-btn del" onclick="deleteMsg('${m.id}')">✕ Delete</button>
-        </div>
-      </div>
-    `).join('');
-  } catch(e) {
-    document.getElementById('message-list').innerHTML = '<div class="empty">Failed to load messages</div>';
-  }
-}
-
-async function markRead(id) {
-  await fetch(`/api/admin/messages/${id}/read`, { method:'PATCH', headers:{'x-admin-key': adminKey} });
-  document.getElementById(`msg-${id}`)?.classList.replace('unread','read');
-  const badge = document.getElementById('unread-badge');
-  const cur = parseInt(badge.textContent) - 1;
-  if (cur <= 0) badge.style.display = 'none';
-  else badge.textContent = cur;
-  document.getElementById('a-unread').textContent = Math.max(0, parseInt(document.getElementById('a-unread').textContent) - 1);
-}
-
-async function deleteMsg(id) {
-  if (!confirm('Delete this message?')) return;
-  await fetch(`/api/admin/messages/${id}`, { method:'DELETE', headers:{'x-admin-key': adminKey} });
-  document.getElementById(`msg-${id}`)?.remove();
-}
-
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-</script>
+        `).join('') || '<p>No messages yet.</p>';
+      } catch (e) { alert('Access Denied'); }
+    }
+    if (localStorage.getItem('admin_key')) loadDashboard();
+  </script>
 </body>
 </html>
