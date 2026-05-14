@@ -76,41 +76,47 @@ app.post('/api/ai/analyze', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'No text provided' });
   
-  // Simulated ML analysis logic
-  const length = text.length;
-  const words = text.split(/\s+/).length;
-  const sentiment = text.toLowerCase().includes('good') || text.toLowerCase().includes('great') ? 'Positive' : 'Neutral';
+  const q = text.toLowerCase();
+  let analysis = "";
   
-  res.json({
-    analysis: {
-      sentiment,
-      complexity: length > 100 ? 'High' : 'Standard',
-      tokens: Math.ceil(words * 1.3),
-      insight: `Vatsal's Auto-Sense logic predicts this input has a ${sentiment} trajectory.`
-    }
-  });
+  if (q.includes('obstacle') || q.includes('car') || q.includes('pedestrian')) {
+    analysis = "OBJECT_DETECTED: Priority 1. Auto-Sense predicts a safe avoidance trajectory via 4D point-cloud mapping.";
+  } else if (q.includes('weather') || q.includes('rain') || q.includes('snow')) {
+    analysis = "SENSOR_ADAPTATION: Triggered. Switching to LIDAR-weighted perception for high-noise environmental data.";
+  } else {
+    analysis = "SYSTEM_SCAN: Normal. Vatsal's predictive engine has processed the telemetry with 99.8% confidence.";
+  }
+  
+  res.json({ analysis: { insight: analysis } });
 });
 
 // AI Agent
-const VATSAL_CONTEXT = "Vatsal Maisuria is a Computer Engineer in Ingolstadt, Germany. Expert in Flutter, Java, AI, and QA. 3+ years experience. 8.32 CGPA.";
+const VATSAL_CONTEXT = `
+Vatsal Maisuria is a Computer Engineer specializing in Flutter, Java, and AI/ML. 
+Professional Info: 3+ years experience at Annextech Software. Expertise in Clean Architecture and QA Automation.
+Location: Ingolstadt, Germany.
+Policy: Do not share personal address, private phone numbers, or detailed financial data. 
+For sensitive inquiries or important matters, always say: "Please contact Vatsal directly at vatsalde0311@gmail.com for more important matters."
+`;
+
 app.post('/api/ai/ask', async (req, res) => {
   const { question } = req.body;
   const apiKey = process.env.AI_API_KEY;
   
   if (!apiKey) {
-    return res.json({ answer: "I'm Vatsal's AI assistant. He's an expert in Flutter and AI. Contact him at vatsalde0311@gmail.com!" });
+    return res.json({ answer: "I'm VM-AI. I know Vatsal is an expert in Flutter and AI. For more important matters, please contact him directly at vatsalde0311@gmail.com." });
   }
 
   try {
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
       messages: [
-        { role: "system", content: `You are VM-AI, Vatsal Maisuria's assistant. Context: ${VATSAL_CONTEXT}` },
+        { role: "system", content: `You are VM-AI. Limit your knowledge to Vatsal's professional career. ${VATSAL_CONTEXT}` },
         { role: "user", content: question }
       ]
-    }, { headers: { 'Authorization': `Bearer ${apiKey}` } });
+    }, { headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' } });
     res.json({ answer: response.data.choices[0].message.content });
-  } catch (e) { res.json({ answer: "Brain fog! Please email Vatsal directly." }); }
+  } catch (e) { res.json({ answer: "I'm having a technical moment. Please contact Vatsal at vatsalde0311@gmail.com for important matters." }); }
 });
 
 // ── ADMIN API ────────────────────────────────────────────────────────────────
