@@ -15,8 +15,10 @@ const HOST = '0.0.0.0';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 // ── DATABASE SETUP ────────────────────────────────────────────────────────────
-const dataDir = process.env.RENDER ? '/data' : path.join(__dirname, '../data');
+// Using a relative path for the data directory to avoid root-level permission errors
+const dataDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+
 const db = new Database(path.join(dataDir, 'portfolio.db'));
 db.pragma('journal_mode = WAL');
 
