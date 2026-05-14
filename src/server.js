@@ -13,7 +13,9 @@ const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; // Render uses port 10000 by default if not specified
+const HOST = '0.0.0.0'; // Essential for Render to bind correctly
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 
 // ── EMAIL SETUP ───────────────────────────────────────────────────────────────
@@ -437,8 +439,8 @@ app.use((req, res) => {
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n🎬 Vatsal Portfolio Server running on http://localhost:${PORT}`);
-  console.log(`📊 Admin dashboard: http://localhost:${PORT}/admin`);
+app.listen(PORT, HOST, () => {
+  console.log(`\n🎬 Vatsal Portfolio Server running on http://${HOST}:${PORT}`);
+  console.log(`📊 Admin dashboard: http://${HOST}:${PORT}/admin`);
   console.log(`🔑 Admin password: ${ADMIN_PASSWORD}\n`);
 });
