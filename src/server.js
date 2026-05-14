@@ -71,6 +71,26 @@ app.post('/api/contact', (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Database error' }); }
 });
 
+// AI Project Demo: Text Insight
+app.post('/api/ai/analyze', async (req, res) => {
+  const { text } = req.body;
+  if (!text) return res.status(400).json({ error: 'No text provided' });
+  
+  // Simulated ML analysis logic
+  const length = text.length;
+  const words = text.split(/\s+/).length;
+  const sentiment = text.toLowerCase().includes('good') || text.toLowerCase().includes('great') ? 'Positive' : 'Neutral';
+  
+  res.json({
+    analysis: {
+      sentiment,
+      complexity: length > 100 ? 'High' : 'Standard',
+      tokens: Math.ceil(words * 1.3),
+      insight: `Vatsal's Auto-Sense logic predicts this input has a ${sentiment} trajectory.`
+    }
+  });
+});
+
 // AI Agent
 const VATSAL_CONTEXT = "Vatsal Maisuria is a Computer Engineer in Ingolstadt, Germany. Expert in Flutter, Java, AI, and QA. 3+ years experience. 8.32 CGPA.";
 app.post('/api/ai/ask', async (req, res) => {

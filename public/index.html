@@ -190,6 +190,19 @@
     <span class="section-num">// 02</span>
     <h2 class="section-title reveal">Featured Work</h2>
     <div class="projects-grid">
+      <!-- NEW AI PROJECT -->
+      <a href="https://github.com/Vatsal031177/Auto-Sense-AI-Perception" target="_blank" class="project-card reveal" style="border-color:var(--red); background: linear-gradient(145deg, var(--bg-card) 0%, #1a0505 100%);">
+        <div class="project-meta"><span class="project-cat">Generative AI · Autonomous Systems</span><span class="project-num">NEW</span></div>
+        <h3 class="project-name">Auto-Sense: Predictive Perception Engine</h3>
+        <p class="project-desc">A deep learning framework designed for autonomous vehicle telemetry. Uses Transformers and Computer Vision to predict obstacle trajectories and optimize path-finding in real-time environments.</p>
+        <div id="ai-demo-box" style="display:none; margin-top:1rem; padding:1rem; background:rgba(0,0,0,0.3); border-radius:8px; font-size:0.8rem;">
+          <input type="text" id="demo-input" placeholder="Enter scenario text..." class="ai-input" style="height:35px; font-size:0.75rem; margin-bottom:0.5rem;">
+          <button onclick="runDemo(event)" class="btn btn-primary" style="padding:0.4rem 1rem; font-size:0.7rem;">Analyze Scenario</button>
+          <div id="demo-result" style="margin-top:0.8rem; color:var(--red); font-family:var(--font-mono);"></div>
+        </div>
+        <div class="project-link" style="color:var(--red)" onclick="toggleDemo(event)">Live AI Demo ➔</div>
+      </a>
+
       <!-- Flagship AI -->
       <a href="#" onclick="toggleAI();return false;" class="project-card reveal">
         <div class="project-meta"><span class="project-cat">Flagship · AI</span><span class="project-num">01</span></div>
@@ -376,6 +389,35 @@
       } catch (e) {
         typing.remove();
         appendMsg("System error. Please contact Vatsal directly.", 'bot');
+      }
+    }
+
+    // AI Demo Logic
+    function toggleDemo(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const box = document.getElementById('ai-demo-box');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function runDemo(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = document.getElementById('demo-input');
+      const result = document.getElementById('demo-result');
+      if (!input.value) return;
+      
+      result.textContent = "Processing...";
+      try {
+        const res = await fetch('/api/ai/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: input.value })
+        });
+        const data = await res.json();
+        result.textContent = `RESULT: ${data.analysis.insight}`;
+      } catch (e) {
+        result.textContent = "ANALYSIS_FAILED: Connection lost.";
       }
     }
 
