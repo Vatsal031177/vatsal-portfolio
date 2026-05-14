@@ -29,12 +29,14 @@ const transporter = process.env.SMTP_HOST ? nodemailer.createTransport({
 
 // ── DATABASE SETUP ────────────────────────────────────────────────────────────
 // Ensure data directory exists BEFORE opening the database
-const dataDir = path.join(__dirname, '../data');
+// On Render with a persistent disk, /data is the root-level mount point
+const dataDir = process.env.RENDER ? '/data' : path.join(__dirname, '../data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Database(path.join(dataDir, 'portfolio.db'));
+const dbPath = path.join(dataDir, 'portfolio.db');
+const db = new Database(dbPath);
 
 // Enable WAL mode for better performance
 db.pragma('journal_mode = WAL');
@@ -214,7 +216,7 @@ app.post('/api/contact', contactLimit, (req, res) => {
     if (transporter) {
       transporter.sendMail({
         from: `"Portfolio" <${process.env.SMTP_USER}>`,
-        to: process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER,
+        to: process.env.NOTIFICATION_EMAIL || process.env.NOTIFY_EMAIL || process.env.SMTP_USER,
         subject: `New Message: ${subject}`,
         text: `From: ${name} (${email})\n\nSubject: ${subject}\n\nMessage:\n${message}`,
         html: `

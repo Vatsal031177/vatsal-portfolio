@@ -13,6 +13,7 @@ A production-ready full-stack portfolio with Node.js + Express backend, SQLite d
 | ⬇️ CV Download Tracking | Counts every download |
 | 🔥 Reactions | Visitors react with 🔥👏💡🚀, saved to DB |
 | 🔐 Admin Dashboard | /admin — view messages, analytics, reply, delete |
+| 🤖 VM-AI Agent | Multimodal AI assistant with voice & context-aware chat |
 | 🛡️ Security | Rate limiting, input validation, Helmet headers |
 
 ---
@@ -26,7 +27,8 @@ vatsal-portfolio/
 ├── public/
 │   ├── index.html             # Main portfolio (frontend)
 │   ├── admin.html             # Admin dashboard
-│   └── vatsal-maisuria-cv.pdf ← ADD YOUR CV PDF HERE
+│   ├── vatsal-maisuria-cv.pdf
+│   └── vatsal-maisuria-cover-letter.pdf
 ├── data/                      # Auto-created on first run (SQLite DB lives here)
 ├── .env.example               # Copy to .env and configure
 ├── package.json
